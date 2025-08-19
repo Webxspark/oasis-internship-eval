@@ -210,7 +210,7 @@ function App() {
                   path="/user/task-filter" 
                   element={
                     <ProtectedRoute>
-                      <TaskFilter />
+                      <TaskFilter view={'user'} />
                     </ProtectedRoute>
                   } 
                 />

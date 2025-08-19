@@ -1,12 +1,12 @@
-const API_URL = "https://zidio-task-management-backend.onrender.com/";
+const API_URL = process.env.API_URL;
 
-export const fetchTasks = async () => {
-  const response = await fetch(API_URL);
+export const fetchTasks = async (userId) => {
+  const response = await fetch(`${API_URL}/user?userId=${userId}`);
   return await response.json();
 };
 
 export const createTask = async (task) => {
-  const response = await fetch(API_URL, {
+  const response = await fetch(`${API_URL}/user`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(task),
@@ -15,7 +15,7 @@ export const createTask = async (task) => {
 };
 
 export const deleteTask = async (id) => {
-  await fetch(`${API_URL}/${id}`, { method: "DELETE" });
+  await fetch(`${API_URL}/user/${id}`, { method: "DELETE" });
 };
 
 export const updateTask = async (id, updates) => {

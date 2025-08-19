@@ -1,7 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import UserSidebar from "./UserSidebar";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { createTask, deleteTask, fetchTasks } from "../../api";
+import { Link } from "react-router-dom";
 
 const UserPage = () => {
   const [tasks, setTasks] = useState([]);
@@ -14,46 +16,43 @@ const UserPage = () => {
     progress: 0,
   });
 
+  const fetchdata = useCallback(() => {
+    fetchTasks(localStorage.userId).then(response => setTasks(response))
+  }, [])
+
   useEffect(() => {
     // ✅ Fetch logged-in user from localStorage
     const storedUser = JSON.parse(localStorage.getItem("loggedInUser"));
     setLoggedInUser(storedUser?.name || "Unknown User");
-
-    // ✅ Fetch stored tasks
-    const storedTasks = JSON.parse(localStorage.getItem("tasks")) || [];
-    setTasks(storedTasks);
-  }, []);
+    fetchdata()
+  }, [fetchdata]);
 
   // Handle Task Creation
-  const handleCreateTask = (e) => {
+  const handleCreateTask = async (e) => {
     e.preventDefault();
     if (!newTask.title.trim() || !newTask.description.trim()) return;
 
     const taskId = Date.now().toString();
-    
+
     // ✅ Assign task to logged-in user
-    const newTaskItem = { 
-      id: taskId, 
-      ...newTask, 
-      assignedTo: loggedInUser // ✅ Store assigned user
+    const newTaskItem = {
+      id: taskId,
+      ...newTask,
+      assignedTo: localStorage.userId
     };
 
-    const updatedTasks = [...tasks, newTaskItem];
-    setTasks(updatedTasks);
-    localStorage.setItem("tasks", JSON.stringify(updatedTasks));
+    const response = await createTask(newTaskItem)
 
     toast.success("Task added successfully!", { icon: "✅" });
-
+    fetchdata()
     setNewTask({ title: "", description: "", priority: "Medium", deadline: "", progress: 0 });
   };
 
   // Handle Task Deletion
-  const handleDeleteTask = (taskId) => {
-    const updatedTasks = tasks.filter((task) => task.id !== taskId);
-    setTasks(updatedTasks);
-    localStorage.setItem("tasks", JSON.stringify(updatedTasks));
-
+  const handleDeleteTask = async (taskId) => {
+    const resp = await deleteTask(taskId)
     toast.error("Task removed successfully!", { icon: "🗑️" });
+    fetchdata()
   };
 
   // Handle Progress Update
@@ -79,7 +78,7 @@ const UserPage = () => {
 
       <div className="flex-1 p-6">
         <h1 className="text-4xl font-bold mb-6 text-center w-full">
-          <span>🎯</span> 
+          <span>🎯</span>
           <span className="bg-gradient-to-r from-blue-600 to-purple-600 text-transparent bg-clip-text">
             User Task Management
           </span>
@@ -148,6 +147,12 @@ const UserPage = () => {
             </button>
           </form>
         </div>
+        
+        <Link to={'/user/task-filter'}>
+          <button className=" bg-blue-600 mb-4 text-white p-3 rounded-lg font-semibold text-lg hover:bg-blue-700 transition-all">
+            Filter
+          </button>
+        </Link>
 
         {/* Task List */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
