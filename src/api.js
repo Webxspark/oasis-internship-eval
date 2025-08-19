@@ -26,3 +26,21 @@ export const updateTask = async (id, updates) => {
   });
   return await response.json();
 };
+
+
+export const createLog = async (logInfo) => {
+  const resp = await fetch(`${API_URL}/task-3`, {
+    method: "POST",
+    body: JSON.stringify(logInfo),
+    headers: { "Content-Type": "application/json" },
+  })
+  return await resp.json();
+}
+
+export const deleteLog = async (id) => {
+  return await fetch(`${API_URL}/task-3/${id}`, { method: "DELETE" });
+}
+
+export const allLogs = async() => {
+  return await fetch(`${API_URL}/task-3`)
+}

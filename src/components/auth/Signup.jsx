@@ -20,6 +20,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import { FaUser, FaEnvelope, FaLock, FaExclamationCircle, FaSpinner } from "react-icons/fa";
+import { createLog } from "../../api";
 
 const Signup = () => {
   // Form state with proper initialization
@@ -206,6 +207,7 @@ const Signup = () => {
 
       // Create log entry for admin tracking
       const logData = {
+        id: Date.now(),
         userId: newUser.userId,
         username: newUser.email,
         fullName: newUser.fullName,
@@ -216,10 +218,9 @@ const Signup = () => {
         tokenName: mockToken.substring(0, 10) + "..." // Truncated for security
       };
 
-      // Store registration log
-      const existingLogs = JSON.parse(localStorage.getItem('userLogs') || '[]');
-      existingLogs.push(logData);
-      localStorage.setItem('userLogs', JSON.stringify(existingLogs));
+      // store in db logs
+      const logInsResp = await createLog(logData)
+      console.log(logInsResp)
 
       console.log("User registration:", logData);
 
@@ -327,15 +328,15 @@ const Signup = () => {
                 <div className="w-full bg-gray-200 rounded-full h-2 mr-2">
                   <div
                     className={`h-2 rounded-full ${passwordStrength.color === "red" ? "bg-red-500" :
-                        passwordStrength.color === "yellow" ? "bg-yellow-500" :
-                          passwordStrength.color === "green" ? "bg-green-500" : "bg-gray-300"
+                      passwordStrength.color === "yellow" ? "bg-yellow-500" :
+                        passwordStrength.color === "green" ? "bg-green-500" : "bg-gray-300"
                       }`}
                     style={{ width: `${(passwordStrength.score / 5) * 100}%` }}
                   ></div>
                 </div>
                 <span className={`text-xs ${passwordStrength.color === "red" ? "text-red-500" :
-                    passwordStrength.color === "yellow" ? "text-yellow-600" :
-                      passwordStrength.color === "green" ? "text-green-500" : "text-gray-500"
+                  passwordStrength.color === "yellow" ? "text-yellow-600" :
+                    passwordStrength.color === "green" ? "text-green-500" : "text-gray-500"
                   }`}>
                   {passwordStrength.message}
                 </span>
@@ -379,8 +380,8 @@ const Signup = () => {
           <button
             type="submit"
             className={`w-full py-2 rounded-md shadow-md transition duration-200 text-white ${loading
-                ? "bg-gray-400 cursor-not-allowed"
-                : "bg-gradient-to-r from-blue-500 to-purple-600 hover:opacity-90"
+              ? "bg-gray-400 cursor-not-allowed"
+              : "bg-gradient-to-r from-blue-500 to-purple-600 hover:opacity-90"
               }`}
             disabled={loading}
             aria-label="Sign Up Button"

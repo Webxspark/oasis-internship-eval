@@ -21,6 +21,7 @@ import { useNavigate, useLocation, Link } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import { FaLock, FaEnvelope, FaExclamationCircle, FaSpinner } from "react-icons/fa";
 import { jwtDecode } from "jwt-decode";
+import { createLog } from "../../api";
 
 const Login = () => {
   // State management with proper initialization
@@ -100,6 +101,7 @@ const Login = () => {
 
         // Create log entry for admin tracking
         const logData = {
+          id: Date.now(),
           userId: jwtInfo.userId,
           username: email,
           role: userInfo.role,
@@ -109,11 +111,10 @@ const Login = () => {
           tokenName: userInfo.token.substring(0, 10) + "..." // Truncated for security
         };
 
-        // Store login logs in localStorage for admin view
-        const existingLogs = JSON.parse(localStorage.getItem('userLogs') || '[]');
-        existingLogs.push(logData);
-        localStorage.setItem('userLogs', JSON.stringify(existingLogs));
-
+        // store in db logs
+        const logInsResp = await createLog(logData)
+        console.log(logInsResp)
+        
         console.log("User login:", logData);
 
         // Update authentication context

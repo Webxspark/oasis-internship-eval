@@ -7,6 +7,7 @@ const bodyParser = require("body-parser");
 const authRoutes = require('./routes/authRoutes');
 const forgotPassRoutes = require("./routes/forgetPasswordRoute");
 const UserRoutes = require("./routes/task-2")
+const Task3Routes = require("./routes/task-3")
 const app = express();
 app.use(express.json());
 app.use(cors());
@@ -16,6 +17,7 @@ app.use(bodyParser.json());
 app.use('/api/auth', authRoutes);
 app.use("/api", forgotPassRoutes);
 app.use("/user", UserRoutes)
+app.use("/task-3", Task3Routes)
 const PORT = process.env.PORT || 5000;
 
 const mongoURI = process.env.MONGO_URI;
